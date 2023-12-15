@@ -1,10 +1,18 @@
 import { defineConfig } from 'vite';
+import { resolve } from 'path';
 import vue from '@vitejs/plugin-vue';
 import UnoCSS from 'unocss/vite';
+import vueJsx from '@vitejs/plugin-vue-jsx';
 
 // https://vitejs.dev/config/
 export default defineConfig({
-    plugins: [vue(), UnoCSS()],
+    plugins: [vue(), UnoCSS(), vueJsx()],
+    resolve: {
+        alias: {
+            /** @ 符号指向 src 目录 */
+            '@': resolve(__dirname, './src')
+        }
+    },
     server: {
         /** 是否开启 HTTPS */
         // https: true,
