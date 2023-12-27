@@ -1,9 +1,9 @@
 import { defineComponent } from 'vue';
-import HelloWorld from '@/components/HelloWorld';
+import Dashboard from '@/views/dashboard/index.vue';
 
 export default defineComponent({
     name: 'App',
     setup() {
-        return () => <HelloWorld msg="Vite + Vue + Tsx"></HelloWorld>;
+        return () => <Dashboard />;
     }
 });

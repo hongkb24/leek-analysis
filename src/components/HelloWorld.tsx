@@ -1,5 +1,13 @@
-import { defineComponent, ref, toRefs, onMounted } from 'vue';
+import { defineComponent, ref, onMounted } from 'vue';
+import { ElButton } from 'element-plus';
 import axios from 'axios';
+interface LeekDataType {
+    板块: string;
+    涨跌额: string;
+    涨跌幅: string;
+    总成交量: string;
+    总成交额: string;
+}
 
 export default defineComponent({
     name: 'HelloWorld',
@@ -7,34 +15,33 @@ export default defineComponent({
         msg: {
             type: String,
             default: ''
+        },
+        size: {
+            type: String,
+            default: 'mini',
+            required: true
         }
     },
     setup(prop) {
-        interface LeekDataType {
-            板块: string;
-            涨跌额: string;
-            涨跌幅: string;
-            总成交量: string;
-            总成交额: string;
-        }
         const list = ref<LeekDataType[]>([]);
 
-        const handle = async () => {
+        const handler = async () => {
             const res = await axios({
                 method: 'get',
                 url: '/api/public/stock_sector_spot'
             });
 
             list.value = res.data;
-            console.log(toRefs(list), 'list.value');
         };
         onMounted(() => {
-            handle();
+            handler();
         });
 
         return () => (
             <div>
-                <div>{prop.msg}</div>
+                <ElButton size="small" type="primary" dark={true}>
+                    {prop.msg}
+                </ElButton>
                 {list.value.map((item, index) => (
                     <div key={index}>
                         <div>板块: {item['板块']}</div>

@@ -1,40 +1,39 @@
-import { defineConfig } from 'vite';
+import { defineConfig, loadEnv, UserConfig, ConfigEnv } from 'vite';
 import { resolve } from 'path';
 import vue from '@vitejs/plugin-vue';
 import UnoCSS from 'unocss/vite';
 import vueJsx from '@vitejs/plugin-vue-jsx';
+import { createProxy } from './build/proxy';
+import { wrapperEnv } from './build/getEnv';
 
 // https://vitejs.dev/config/
-export default defineConfig({
-    plugins: [vue(), UnoCSS(), vueJsx()],
-    resolve: {
-        alias: {
-            /** @ 符号指向 src 目录 */
-            '@': resolve(__dirname, './src')
-        }
-    },
-    server: {
-        /** 是否开启 HTTPS */
-        // https: true,
-        /** 设置 host: true 才可以使用 Network 的形式，以 IP 访问项目 */
-        host: true, // host: "0.0.0.0"
-        /** 端口号 */
-        port: 7070,
-        /** 是否自动打开浏览器 */
-        // open: true,
-        /** 跨域设置允许 */
-        cors: true,
-        /** 端口被占用时，是否直接退出 */
-        strictPort: false,
-        /** 接口代理 */
-        proxy: {
-            '/api': {
-                target: 'http://127.0.0.1:8080/api',
-                ws: true,
-                /** 是否允许跨域 */
-                changeOrigin: true,
-                rewrite: (path) => path.replace('/api', '')
+export default defineConfig(({ mode }: ConfigEnv): UserConfig => {
+    const root = process.cwd();
+    const env = loadEnv(mode, root);
+    const viteEnv = wrapperEnv(env);
+
+    return {
+        base: viteEnv.VITE_PUBLIC_PATH,
+        root,
+        plugins: [vue(), UnoCSS(), vueJsx()],
+        resolve: {
+            alias: {
+                /** @ 符号指向 src 目录 */
+                '@': resolve(__dirname, './src')
             }
+        },
+        server: {
+            host: true, // host: "0.0.0.0"
+            /** 端口号 */
+            port: 7070,
+            /** 是否自动打开浏览器 */
+            // open: true,
+            /** 跨域设置允许 */
+            cors: true,
+            /** 端口被占用时，是否直接退出 */
+            strictPort: false,
+            // Load proxy configuration from .env.development
+            proxy: createProxy(viteEnv.VITE_PROXY)
         }
-    }
+    };
 });
